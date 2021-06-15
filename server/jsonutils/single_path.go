@@ -40,6 +40,23 @@ func (jp *SingleJSONPath) GetAndRemove(obj map[string]interface{}) (interface{},
 	return jp.getAndRemove(obj, true)
 }
 
+//SetIfNotExist puts value into the object only if JSON path doesn't exist
+//in other words DOESN'T overwrite key
+//{key1:"abc", key2:"qwe"} /key1/key3 -> set
+//{key1:"abc", key2:"qwe"} /key1/key2 -> not set
+func (jp *SingleJSONPath) SetIfNotExist(obj map[string]interface{}, value interface{}) error {
+	if obj == nil {
+		return nil
+	}
+
+	_, ok := jp.Get(obj)
+	if ok {
+		return nil
+	}
+
+	return jp.Set(obj, value)
+}
+
 func (jp *SingleJSONPath) getAndRemove(obj map[string]interface{}, remove bool) (interface{}, bool) {
 	//dive into obj and return last key
 	for i := 0; i < len(jp.parts); i++ {
